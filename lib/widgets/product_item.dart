@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:shopapp/providers/product.dart';
 import 'package:shopapp/screens/product_detail_screen.dart';
+import 'package:provider/provider.dart';
+
 
 class ProductItem extends StatelessWidget {
-  final String id;
-  final String title;
-  final String imgUrl;
-
-  ProductItem(this.id, this.title, this.imgUrl);
-
+  
   @override
   Widget build(BuildContext context) {
+  final product = Provider.of<Product>(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -17,11 +16,11 @@ class ProductItem extends StatelessWidget {
           onTap: () {
             Navigator.of(context).pushNamed(
               ProductDetailScreen.routeName,
-              arguments: id,
+              arguments: product.id,
             );
           },
           child: Image.network(
-            imgUrl,
+            product.imageUrl,
             fit: BoxFit.cover,
           ),
         ),
@@ -35,7 +34,7 @@ class ProductItem extends StatelessWidget {
             color: Theme.of(context).accentColor,
           ),
           title: Text(
-            title,
+            product.title,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 12),
           ),
