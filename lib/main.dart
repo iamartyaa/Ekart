@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.deepOrange,
           fontFamily: 'Lato',
           textTheme: TextTheme(
-            //titleMedium: TextStyle(color: Colors.white),
+            titleMedium: TextStyle(color: Colors.black),
           ),
         ),
         home: ProductsOverviewScreen(),
