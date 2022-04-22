@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'ShopApp',
         theme: ThemeData(
           primarySwatch: Colors.purple,
@@ -42,9 +43,9 @@ class MyApp extends StatelessWidget {
         routes: {
           ProductDetailScreen.routeName: (context) => ProductDetailScreen(),
           CartScreen.routeName: (context) => CartScreen(),
-          OrdersScreen.routeName:(context) => OrdersScreen(),
-          UserProductsScreen.routeName:(context) => UserProductsScreen(),
-          EditProductScreen.routeName:(context) => EditProductScreen(),
+          OrdersScreen.routeName: (context) => OrdersScreen(),
+          UserProductsScreen.routeName: (context) => UserProductsScreen(),
+          EditProductScreen.routeName: (context) => EditProductScreen(),
         },
       ),
     );
