@@ -19,19 +19,42 @@ class CartItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: ValueKey(id),
-      onDismissed: (direction){
-        Provider.of<Cart>(context,listen: false).removeItem(productId);
+      confirmDismiss: (direction) {
+        return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Are you Sure?'),
+            content: const Text('Do you want to remove the Item from the Cart?'),
+            actions: [
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: const Text('NO',style: TextStyle(color: Colors.deepOrange),),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text('YES',style: TextStyle(color: Colors.deepOrange),),
+              ),
+            ],
+          ),
+        );
+      },
+      onDismissed: (direction) {
+        Provider.of<Cart>(context, listen: false).removeItem(productId);
       },
       direction: DismissDirection.endToStart,
       background: Container(
         color: Colors.red,
-        child: Icon(
+        child: const Icon(
           Icons.delete,
           color: Colors.white,
           size: 40,
         ),
         alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(right: 20),
+        padding: const EdgeInsets.only(right: 20),
         margin: const EdgeInsets.symmetric(
           horizontal: 15,
           vertical: 4,
@@ -53,7 +76,7 @@ class CartItem extends StatelessWidget {
             ),
             title: Text(
               title,
-              style: TextStyle(color: Colors.black54),
+              style: const TextStyle(color: Colors.black54),
             ),
             subtitle: Text('Total: \$ ${price * quantity}'),
             trailing: Text('$quantity x'),
