@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shopapp/providers/product.dart';
+import 'package:shopapp/providers/products.dart';
 
 class EditProductScreen extends StatefulWidget {
   static const routeName = '/edit-product';
@@ -26,14 +28,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
       if (_imageUrlController.text.isEmpty ||
-          !_imageUrlController.text.startsWith('http') ||
-          !_imageUrlController.text.startsWith('https') ||
-          !_imageUrlController.text.endsWith('.png') ||
-          !_imageUrlController.text.endsWith('.jpg') ||
-          !_imageUrlController.text.endsWith('.jpeg')){
-            return;
-          } 
-    setState(() {});
+          (!_imageUrlController.text.startsWith('http') &&
+              !_imageUrlController.text.startsWith('https')) ||
+          (!_imageUrlController.text.endsWith('.png') &&
+              !_imageUrlController.text.endsWith('.jpg') &&
+              !_imageUrlController.text.endsWith('.jpeg'))) {
+        return;
+      }
+      setState(() {});
     }
   }
 
@@ -44,12 +46,48 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.initState();
   }
 
+  var _isInit = true;
+  var _initValues = {
+    'title': '',
+    'description': '',
+    'price': '',
+    'imageUrl': '',
+  };
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    if (_isInit == true) {
+      final prodId = ModalRoute.of(context)!.settings.arguments as String;
+      if (prodId != null) {
+        final product =
+            Provider.of<Products>(context, listen: false).findById(prodId);
+        _editedProduct = product;
+        _initValues = {
+          'title': product.title,
+          'description': product.description,
+          'price': product.price.toString(),
+          'imageUrl': '',
+        };
+        _imageUrlController.text = _editedProduct.imageUrl;
+      }
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
+
   void _saveForm() {
     final isValid = _form.currentState!.validate();
     if (!isValid) {
       return;
     }
     _form.currentState!.save();
+    if (_editedProduct.id != '') {
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct.id, _editedProduct);
+    } else {
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -85,6 +123,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: ListView(
               children: [
                 TextFormField(
+                  initialValue: _initValues['title'],
                   decoration: const InputDecoration(
                     labelText: 'Title',
                   ),
@@ -106,10 +145,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       description: _editedProduct.description,
                       price: _editedProduct.price,
                       imageUrl: _editedProduct.imageUrl,
+                      isFavourite: _editedProduct.isFavourite,
                     );
                   },
                 ),
                 TextFormField(
+                  initialValue: _initValues['price'],
                   decoration: const InputDecoration(
                     labelText: 'Price',
                   ),
@@ -126,6 +167,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       description: _editedProduct.description,
                       price: double.parse(value!),
                       imageUrl: _editedProduct.imageUrl,
+                      isFavourite: _editedProduct.isFavourite,
                     );
                   },
                   validator: (value) {
@@ -143,6 +185,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   },
                 ),
                 TextFormField(
+                  initialValue: _initValues['description'],
                   decoration: const InputDecoration(
                     labelText: 'Description',
                   ),
@@ -156,6 +199,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                       description: value!,
                       price: _editedProduct.price,
                       imageUrl: _editedProduct.imageUrl,
+                      isFavourite: _editedProduct.isFavourite,
                     );
                   },
                   validator: (value) {
@@ -196,6 +240,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     ),
                     Expanded(
                       child: TextFormField(
+                        // initialValue: _initValues['imageUrl'],
                         decoration: const InputDecoration(
                           labelText: 'Image URL',
                         ),
@@ -210,6 +255,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             description: _editedProduct.description,
                             price: _editedProduct.price,
                             imageUrl: value!,
+                            isFavourite: _editedProduct.isFavourite,
                           );
                         },
                         onFieldSubmitted: (_) {
@@ -219,12 +265,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           if (value!.isEmpty) {
                             return 'Please enter a Image URL';
                           }
-                          if (!value.startsWith('http') ||
+                          if (!value.startsWith('http') &&
                               !value.startsWith('https')) {
                             return 'Please enter a valid URL';
                           }
-                          if (!value.endsWith('.png') ||
-                              !value.endsWith('.jpg') ||
+                          if (!value.endsWith('.png') &&
+                              !value.endsWith('.jpg') &&
                               !value.endsWith('.jpeg')) {
                             return 'Please enter a valid URL';
                           } else {
