@@ -126,9 +126,16 @@ class Products with ChangeNotifier {
     }
   }
 
-  void updateProduct(String id, Product prod) {
-    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+  Future<void> updateProduct(String id, Product prod) async {
+    final prodIndex = _items.indexWhere((pro) => pro.id == id);
     if (prodIndex > 0) {
+      final url = Uri.https('shop-app-29cf9-default-rtdb.firebaseio.com', '/products/${prod.id}.json');
+      await http.patch(url,body: jsonEncode({
+        'title': prod.title,
+        'description': prod.description,
+        'price': prod.price,
+        'imageUrl': prod.imageUrl,
+      }));
       _items[prodIndex] = prod;
       notifyListeners();
     } else {
@@ -159,7 +166,7 @@ class Products with ChangeNotifier {
               isFavourite: prodData['isFavourite']),
         );
       });
-      _items=loadedProducts;
+      _items = loadedProducts;
       notifyListeners();
     } catch (error) {
       throw error;
