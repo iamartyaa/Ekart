@@ -64,24 +64,54 @@ class Products with ChangeNotifier {
     return _items.firstWhere((element) => element.id == id);
   }
 
-  Future<void> addProduct(Product prod) {
+  // Future<void> addProduct(Product prod) {
+  //   final url = Uri.https(
+  //       'shop-app-29cf9-default-rtdb.firebaseio.com', '/products.json');
+  //   return http
+  //       .post(
+  //     url,
+  //     body: jsonEncode(
+  //       {
+  //         'title': prod.title,
+  //         'description': prod.description,
+  //         'price': prod.price,
+  //         'imageUrl': prod.imageUrl,
+  //         'isFavourite': prod.isFavourite,
+  //       },
+  //     ),
+  //   )
+  //       .then((response) {
+  //         // print(jsonDecode(response.body));
+  //     final newProduct = Product(
+  //       id: jsonDecode(response.body)['name'],
+  //       title: prod.title,
+  //       description: prod.description,
+  //       price: prod.price,
+  //       imageUrl: prod.imageUrl,
+  //     );
+  //     _items.insert(0, newProduct);
+  //     notifyListeners();
+  //   }).catchError((error){
+  //     throw error;
+  //   });
+  // }
+
+  Future<void> addProduct(Product prod) async {
     final url = Uri.https(
         'shop-app-29cf9-default-rtdb.firebaseio.com', '/products.json');
-    return http
-        .post(
-      url,
-      body: jsonEncode(
-        {
-          'title': prod.title,
-          'description': prod.description,
-          'price': prod.price,
-          'imageUrl': prod.imageUrl,
-          'isFavourite': prod.isFavourite,
-        },
-      ),
-    )
-        .then((response) {
-          // print(jsonDecode(response.body));
+    try {
+      final response = await http.post(
+        url,
+        body: jsonEncode(
+          {
+            'title': prod.title,
+            'description': prod.description,
+            'price': prod.price,
+            'imageUrl': prod.imageUrl,
+            'isFavourite': prod.isFavourite,
+          },
+        ),
+      );
       final newProduct = Product(
         id: jsonDecode(response.body)['name'],
         title: prod.title,
@@ -91,9 +121,9 @@ class Products with ChangeNotifier {
       );
       _items.insert(0, newProduct);
       notifyListeners();
-    }).catchError((error){
+    } catch (error) {
       throw error;
-    });
+    }
   }
 
   void updateProduct(String id, Product prod) {
