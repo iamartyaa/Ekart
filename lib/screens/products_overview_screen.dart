@@ -20,16 +20,27 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   var _showOnlyFavourites = false;
+  var isLoading = false;
   @override
   void initState() {
     // TODO: implement initState
     // Provider.of<Products>(context).fetchAndSetProducts();
+    setState(() {
+      isLoading = true;
+    });
     Future.delayed(Duration.zero).then((value) {
-    Provider.of<Products>(context,listen: false).fetchAndSetProducts();
+      Provider.of<Products>(context, listen: false)
+          .fetchAndSetProducts()
+          .then((value) {
+        setState(() {
+          isLoading = false;
+        });
+      });
     });
 
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     // final productsData = Provider.of<Products>(context,listen: false);
@@ -66,15 +77,21 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           ),
           Badge(
               child: IconButton(
-                icon: Icon(Icons.shopping_cart),
-                onPressed: () {Navigator.of(context).pushNamed(CartScreen.routeName);},
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(CartScreen.routeName);
+                },
               ),
               value: cart.itemCount.toString(),
               color: Colors.deepOrange),
         ],
       ),
-      drawer: AppDrawer(),
-      body: ProductsGrid(_showOnlyFavourites),
+      drawer: const AppDrawer(),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavourites),
     );
   }
 }
