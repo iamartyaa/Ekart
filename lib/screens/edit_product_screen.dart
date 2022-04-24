@@ -104,10 +104,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           .addProduct(_editedProduct)
           .catchError(
         (error) {
-          //   setState(() {
-          //   isLoading = false;
-          // });
-          return showDialog(
+          return showDialog<Null>(
             context: context,
             builder: (ctx) => AlertDialog(
               title: Text('Error Occured!'),
@@ -115,7 +112,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               actions: [
                 FlatButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(ctx).pop();
                   },
                   child: Text('OKAY'),
                 ),
