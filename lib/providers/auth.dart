@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:async';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
@@ -40,9 +40,34 @@ class Auth with ChangeNotifier {
       );
       // autoLogOut();
       notifyListeners();
+      final prefs = await SharedPreferences.getInstance();
+      
+      final userData = jsonEncode({
+        'token': _token,
+        'userId': _userId,
+        'expiryDate': _expiryDate.toIso8601String(),
+      });
+      prefs.setString('key', userData);
     } catch (error) {
       throw error;
     }
+  }
+
+  Future<bool> tryAutoLogin() async{
+    final prefs = await SharedPreferences.getInstance();
+    if(!prefs.containsKey('key')){
+      return false;
+    }
+    final extractedData = jsonDecode(prefs.getString('key')!) as Map<String,dynamic>;
+    final expDate = DateTime.parse(extractedData['expiryDate'] as String);
+    if(expDate.isAfter(DateTime.now())){
+      _token=extractedData['token'] as String;
+      _userId=extractedData['userId'] as String;
+      _expiryDate=DateTime.parse(extractedData['expiryDate'] as String);
+      notifyListeners();
+      return true;
+    }
+    return false;
   }
 
   String get userId {
