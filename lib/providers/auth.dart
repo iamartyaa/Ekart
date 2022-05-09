@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +10,7 @@ class Auth with ChangeNotifier {
   late String? _token=null;
   late DateTime _expiryDate=DateTime.now();
   late String? _userId;
-
+  late Timer? _authTimer;
 
 
   Future<void> _authenticate(
@@ -37,6 +38,7 @@ class Auth with ChangeNotifier {
           seconds: int.parse(responseData['expiresIn']),
         ),
       );
+      // autoLogOut();
       notifyListeners();
     } catch (error) {
       throw error;
@@ -44,7 +46,7 @@ class Auth with ChangeNotifier {
   }
 
   String get userId {
-    return _userId!;
+    return _userId==null ? '' : _userId!;
   }
 
   bool get isAuth {
@@ -58,6 +60,27 @@ class Auth with ChangeNotifier {
       return _token;
     }
     return null;
+  }
+
+  void logout (){
+    _expiryDate=DateTime.now().subtract(Duration(seconds: 30));
+    _token=null;
+    _userId=null;
+    // if(_authTimer !=null){
+    //   _authTimer!.cancel();
+    //   _authTimer=null;
+    // }
+
+    notifyListeners();
+  }
+
+  void autoLogOut(){
+    if(_authTimer != null)
+    {
+      _authTimer!.cancel();
+    }
+    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    _authTimer = Timer(Duration(seconds: 3),logout);
   }
 
   Future<void> signup(String email, String password) async {

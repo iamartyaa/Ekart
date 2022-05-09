@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProxyProvider<Auth, Products>(
             create: (ctx) => Products(itemss: [], authToken: '',userId: ''),
             // ignore: unnecessary_null_comparison
-            update: (ctx, auth, previous) => Products(authToken: auth.token! ,itemss: previous!.items==null ? [] : previous.items,userId: auth.userId),
+            update: (ctx, auth, previous) => Products(authToken: auth.token==null ? '':auth.token!   ,itemss: previous!.items==null ? [] : previous.items,userId: auth.userId),
           ),
           ChangeNotifierProvider(
             create: (context) => Cart(),
