@@ -30,7 +30,7 @@ class ProductItem extends StatelessWidget {
           backgroundColor: Colors.black87,
           leading: IconButton(
             onPressed: () {
-              product.toggleFavourite(authData.token);
+              product.toggleFavourite(authData.token,authData.userId);
             },
             icon: Icon(
               product.isFavourite ? Icons.favorite : Icons.favorite_border,
