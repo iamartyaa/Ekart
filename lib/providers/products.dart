@@ -11,7 +11,8 @@ class Products with ChangeNotifier {
 
   // var _showFavouritesOnly= false;
   final String authToken;
-  Products({required this.authToken,required this.itemss});
+  final String userId;
+  Products({required this.authToken,required this.itemss,required this.userId});
   List<Product> get items {
     return [...itemss];
   }
@@ -77,7 +78,7 @@ class Products with ChangeNotifier {
             'description': prod.description,
             'price': prod.price,
             'imageUrl': prod.imageUrl,
-            'isFavourite': prod.isFavourite,
+            'creatorId': userId,
           },
         ),
       );
@@ -113,7 +114,7 @@ class Products with ChangeNotifier {
   }
 
   void delProduct(String id) {
-    final url = Uri.https('shop-app-29cf9-default-rtdb.firebaseio.com', '/products/$id.json?auth=$authToken');
+    final Uri url = Uri.parse('https://shop-app-29cf9-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken');
     final existingProductIndex = items.indexWhere((element) => element.id==id);
     final existingProduct =  itemss[existingProductIndex];
     
@@ -126,8 +127,9 @@ class Products with ChangeNotifier {
   }
   
 
-  Future<void> fetchAndSetProducts() async {
-    final Uri url = Uri.parse("https://shop-app-29cf9-default-rtdb.firebaseio.com/products.json?auth=$authToken");
+  Future<void> fetchAndSetProducts([bool filter = false]) async {
+    final filterString = filter ? '&orderBy="creatorId"&equalTo="$userId"': '';
+    final Uri url = Uri.parse('https://shop-app-29cf9-default-rtdb.firebaseio.com/products.json?auth=$authToken$filterString');
 
     try {
       final response = await http.get(url);
@@ -136,6 +138,9 @@ class Products with ChangeNotifier {
       {
         return;
       }
+      final favouriteResponse = await http.get(Uri.parse("https://shop-app-29cf9-default-rtdb.firebaseio.com/userFavourites/$userId.json?auth=$authToken"));
+      final favouriteData = jsonDecode(favouriteResponse.body);
+      
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(
@@ -145,7 +150,7 @@ class Products with ChangeNotifier {
               description: prodData['description'],
               price: prodData['price'],
               imageUrl: prodData['imageUrl'],
-              isFavourite: prodData['isFavourite']),
+              isFavourite: favouriteData==null ? false : favouriteData[prodId] ?? false),
         );
       });
       
