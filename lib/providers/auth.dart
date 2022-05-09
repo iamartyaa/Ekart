@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:shopapp/models/http_exception.dart';
 
 class Auth with ChangeNotifier {
-  late String _token;
-  late DateTime _expiryDate;
-  late String _userId;
+  late String? _token=null;
+  late DateTime _expiryDate=DateTime.now();
+  late String? _userId;
 
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
@@ -24,13 +24,34 @@ class Auth with ChangeNotifier {
           'returnSecureToken': true,
         }),
       );
-      final responseData=jsonDecode(response.body);
-      if(responseData['error']!=null){
+      final responseData = jsonDecode(response.body);
+      if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
       }
+      _token = responseData['idToken'];
+      _userId = responseData['localId'];
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(responseData['expiresIn']),
+        ),
+      );
+      notifyListeners();
     } catch (error) {
       throw error;
     }
+  }
+
+  bool get isAuth {
+    return token != null;
+  }
+
+  String? get token {
+    if (_token != null &&
+        _expiryDate != null &&
+        _expiryDate.isAfter(DateTime.now())) {
+      return _token;
+    }
+    return null;
   }
 
   Future<void> signup(String email, String password) async {
