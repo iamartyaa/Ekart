@@ -27,16 +27,16 @@ class MyApp extends StatelessWidget {
             create: ((context) => Auth()),
           ),
           ChangeNotifierProxyProvider<Auth, Products>(
-            create: (ctx) => Products(itemss: [], authToken: ''),
+            create: (ctx) => Products(itemss: [], authToken: '',userId: ''),
             // ignore: unnecessary_null_comparison
-            update: (ctx, auth, previous) => Products(authToken: auth.token! ,itemss: previous!.items==null ? [] : previous.items),
+            update: (ctx, auth, previous) => Products(authToken: auth.token! ,itemss: previous!.items==null ? [] : previous.items,userId: auth.userId),
           ),
           ChangeNotifierProvider(
             create: (context) => Cart(),
           ),
           ChangeNotifierProxyProvider<Auth, Orders>(
-            create: (ctx) => Orders('',[]),
-            update: (ctx, auth, previous) => Orders(auth.token,previous!.orders==null ? [] : previous.orders),
+            create: (ctx) => Orders('',[],''),
+            update: (ctx, auth, previous) => Orders(auth.token,previous!.orders==null ? [] : previous.orders,auth.userId),
           ),
           
         ],

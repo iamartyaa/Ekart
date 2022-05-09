@@ -10,6 +10,8 @@ class Auth with ChangeNotifier {
   late DateTime _expiryDate=DateTime.now();
   late String? _userId;
 
+
+
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
     final Uri url = Uri.parse(
@@ -39,6 +41,10 @@ class Auth with ChangeNotifier {
     } catch (error) {
       throw error;
     }
+  }
+
+  String get userId {
+    return _userId!;
   }
 
   bool get isAuth {
