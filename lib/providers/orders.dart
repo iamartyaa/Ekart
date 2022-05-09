@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shopapp/providers/cart.dart';
-import 'package:shopapp/providers/product.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:intl/intl.dart';
 
 class OrderItem {
   final String id;
@@ -33,6 +31,7 @@ class Orders with ChangeNotifier {
     final response = await http.get(url);
     final List<OrderItem> loadedOrders = [];
     final extractedData = jsonDecode(response.body) as Map<String, dynamic>;
+    // ignore: unnecessary_null_comparison
     if(extractedData==null)
     {
       return;
