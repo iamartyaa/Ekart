@@ -1,4 +1,4 @@
-# Boyo Hotels
+# Ekart
 
 A simple Shopping app built in similarity with an e-commerce app  with a cleaner UI.
 
